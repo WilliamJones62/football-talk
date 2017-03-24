@@ -1,0 +1,70 @@
+<div class="club">
+  <h1 class=" club-name text-center" ng-bind="vm.team.name"> </h1>
+  <h2 class=" club-league text-center" ng-bind="vm.team.league"> </h2>
+
+  <button ng-click="vm.loadFixtures()">Fixtures</button>
+
+  <div ng-repeat="game in vm.games">
+      {{ game.home }} game
+      Opponent - {{ game.opponent }}
+      Date - {{ game.date }}
+      Goals for - {{ game.for }}
+      Goals Against - {{ game.against }}
+      Status - {{ game.status }}
+  </div>
+
+  <div class="margin-b-20">
+    <button ng-click="showadd=true">Add a Player</button>
+    <input class="search-btn pull-right" placeholder="Search for a Player" ng-model="search.name">
+  </div>
+
+  <form name="addForm" ng-show="showadd" ng-submit="showadd=false">
+
+    <input name="addName"
+    type="text"
+    class="new-player"
+    placeholder="Player Name"
+    ng-model="vm.player.name"
+    required="required"
+    >
+
+    <button ng-if="addForm.$valid " ng-click="vm.handleCreate()">Add</button>
+
+    <div ng-messages="addForm.addName.$error" ng-if="addForm.addName.$touched && addForm.addName.$error ">
+      <div class="error-message text-center" ng-message="required">Name Required!
+      </div>
+    </div>
+
+  </form>
+
+  <div ng-repeat="player in vm.team.players | filter:search">
+    <div ng-show="vm.isInReadMode(player.id)">
+      {{ player.name }}
+      <button ng-click="vm.startEdit(player.id, player.name)">Edit</button>
+      <button ng-click="vm.handleDelete(player.id)">Delete</button>
+    </div>
+
+    <div ng-show="vm.isInEditMode(player.id)">
+      <form name="editForm">
+
+        <input
+          name="editName"
+          type="text"
+          class="edit-player"
+          ng-model="vm.player.name"
+          required="required"
+        >
+        <button ng-if="editForm.$valid " ng-click="vm.handleEdit(player.id)">Save</button>
+        <button ng-click="vm.handleCancel()">Cancel</button>
+
+        <div ng-messages="editForm.editName.$error" ng-if="editForm.editName.$touched && editForm.editName.$error ">
+            <div class="error-message text-center" ng-message="required">Team name required!
+            </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <button ui-sref="teams">My Teams</button>
+
+</div>
