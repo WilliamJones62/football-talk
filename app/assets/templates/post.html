@@ -1,70 +1,126 @@
-<div class="club">
-  <h1 class=" club-name text-center" ng-bind="vm.team.name"> </h1>
-  <h2 class=" club-league text-center" ng-bind="vm.team.league"> </h2>
+<div class="post">
 
-  <button ng-click="vm.loadFixtures()">Fixtures</button>
+  <div ng-show="vm.isInLeagueMode">
 
-  <div ng-repeat="game in vm.games">
+    <h1 class="text-center"> Choose a league </h1>
+    <input class="search-btn pull-right" placeholder="Search for a League" ng-model="search.name">
+    <div ng-repeat="league in vm.leagues | filter:search">
+      {{ league.name }}
+      <button ng-click="vm.selectTeam(league.id, league.name)">Select</button>
+    </div>
+  </div>
+
+
+  <div ng-show="vm.isInTeamMode">
+
+    <h1 class="text-center"> Choose a Team </h1>
+    <h2 class="text-center" ng-bind="vm.league.name"> </h2>
+    <input class="search-btn pull-right" placeholder="Search for a League" ng-model="search.name">
+    <div ng-repeat="team in vm.teams | filter:search">
+      {{ team.name }}
+      <button ng-click="vm.selectGame(league.id, league.name, team.id, team.name)">Select</button>
+    </div>
+  </div>
+
+  <div ng-show="vm.isInGameMode">
+
+    <h1 class="text-center"> Choose a Game </h1>
+    <h2 class="text-center" ng-bind="vm.league.name"> </h2>
+    <h3 class="text-center" ng-bind="vm.team.name"> </h3>
+    <div ng-repeat="game in vm.games">
       {{ game.home }} game
       Opponent - {{ game.opponent }}
       Date - {{ game.date }}
       Goals for - {{ game.for }}
       Goals Against - {{ game.against }}
       Status - {{ game.status }}
+      <button ng-click="vm.selectPost(league.id, league.name, team.id, team.name, game.id, game.date, game.opponent)">Select</button>
+    </div>
   </div>
 
-  <div class="margin-b-20">
-    <button ng-click="showadd=true">Add a Player</button>
-    <input class="search-btn pull-right" placeholder="Search for a Player" ng-model="search.name">
-  </div>
+  <div ng-show="vm.isInPostMode">
 
-  <form name="addForm" ng-show="showadd" ng-submit="showadd=false">
+    <h1 class="text-center"> Posts </h1>
+    <h2 class="text-center" ng-bind="vm.team.name"> </h2>
+    <h3 class="text-center" ng-bind="vm.game.date"> </h3>
+    <h4 class="text-center" ng-bind="vm.game.opponent"> </h3>
+    <div class="margin-b-20">
+      <button ng-click="showadd=true">Add a Post</button>
+      <input class="search-btn pull-right" placeholder="Search for a Post" ng-model="search.name">
+    </div>
 
-    <input name="addName"
-    type="text"
-    class="new-player"
-    placeholder="Player Name"
-    ng-model="vm.player.name"
-    required="required"
-    >
+    <form name="addForm" ng-show="showadd" ng-submit="showadd=false">
 
-    <button ng-if="addForm.$valid " ng-click="vm.handleCreate()">Add</button>
+      <input name="addTitle"
+      type="text"
+      class="new-post"
+      placeholder="Post Title"
+      ng-model="vm.post.title"
+      required="required"
+      >
 
-    <div ng-messages="addForm.addName.$error" ng-if="addForm.addName.$touched && addForm.addName.$error ">
-      <div class="error-message text-center" ng-message="required">Name Required!
+      <input name="addBody"
+      type="text"
+      class="new-body"
+      placeholder="Post Body"
+      ng-model="vm.post.body"
+      required="required"
+      >
+
+      <button ng-if="addForm.$valid " ng-click="vm.handleCreate()">Add</button>
+
+      <div ng-messages="addForm.addTitle.$error" ng-if="addForm.addTitle.$touched && addForm.addTitle.$error ">
+        <div class="error-message text-center" ng-message="required">Title Required!
+        </div>
+      </div>
+
+      <div ng-messages="addForm.addBody.$error" ng-if="addForm.addBody.$touched && addForm.addBody.$error ">
+        <div class="error-message text-center" ng-message="required">Body Required!
+        </div>
+      </div>
+
+    </form>
+
+    <div ng-repeat="post in vm.posts | filter:search">
+      <div ng-show="vm.isInReadMode(player.id)">
+        {{ post.title }}
+        {{ post.body }}
+        <button ng-click="vm.startEdit(post.id, post.title, post.body)">Edit</button>
+        <button ng-click="vm.handleDelete(post.id)">Delete</button>
+      </div>
+
+      <div ng-show="vm.isInEditMode(player.id)">
+        <form name="editForm">
+
+          <input
+            name="editTitle"
+            type="text"
+            class="edit-post"
+            ng-model="vm.post.title"
+            required="required"
+          >
+          <input
+            name="editBody"
+            type="text"
+            class="edit-post"
+            ng-model="vm.post.body"
+            required="required"
+          >
+          <button ng-if="editForm.$valid " ng-click="vm.handleEdit(post.id)">Save</button>
+          <button ng-click="vm.handleCancel()">Cancel</button>
+
+          <div ng-messages="editForm.editTitle.$error" ng-if="editForm.editTitle.$touched && editForm.editTitle.$error ">
+              <div class="error-message text-center" ng-message="required">Post title required!
+              </div>
+          </div>
+          <div ng-messages="editForm.editBody.$error" ng-if="editForm.editBody.$touched && editForm.editBody.$error ">
+              <div class="error-message text-center" ng-message="required">Post body required!
+              </div>
+          </div>
+        </form>
       </div>
     </div>
 
-  </form>
-
-  <div ng-repeat="player in vm.team.players | filter:search">
-    <div ng-show="vm.isInReadMode(player.id)">
-      {{ player.name }}
-      <button ng-click="vm.startEdit(player.id, player.name)">Edit</button>
-      <button ng-click="vm.handleDelete(player.id)">Delete</button>
-    </div>
-
-    <div ng-show="vm.isInEditMode(player.id)">
-      <form name="editForm">
-
-        <input
-          name="editName"
-          type="text"
-          class="edit-player"
-          ng-model="vm.player.name"
-          required="required"
-        >
-        <button ng-if="editForm.$valid " ng-click="vm.handleEdit(player.id)">Save</button>
-        <button ng-click="vm.handleCancel()">Cancel</button>
-
-        <div ng-messages="editForm.editName.$error" ng-if="editForm.editName.$touched && editForm.editName.$error ">
-            <div class="error-message text-center" ng-message="required">Team name required!
-            </div>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <button ui-sref="teams">My Teams</button>
+  <button ui-sref="home">Home</button>
 
 </div>
