@@ -3,77 +3,128 @@
 
     angular
         .module('app')
-        .controller('ClubController',['ClubFactory', '$stateParams', function(ClubFactory, $stateParams){
+        .controller('PostController',['PostFactory', '$stateParams', function(PostFactory, $stateParams){
             var selectedId = -1;
+            var leagueId = -1;
+            var teamId = -1;
+            var gameId = -1;
             var vm = this;
-            var teamId = $stateParams.id;
-            vm.player = { id: null, name: '', team_id: teamId};
+            var postId = $stateParams.id;
+            vm.post = { id: null, title: '', body: '', league_id: null, team_id: null, game_id: null};
             vm.startEdit = startEdit;
-            vm.loadFixtures = loadFixtures;
             vm.isInReadMode = isInReadMode;
             vm.isInEditMode = isInEditMode;
-            var competitions = [];
-            var fixtures = [];
+            vm.isInLeagueMode = isInLeagueMode;
+            vm.isInTeamMode = isInTeamMode;
+            vm.isInGameMode = isInGameMode;
+            vm.isInPostMode = isInPostMode;
+            var leagues = [];
+            var games = [];
             var teams = [];
             vm.games = [];
             var i = 0;
             var href = 'http://api.football-data.org/v1/competitions/';
             var competitionId = 0;
-            var competitionFound = false;
-            var teamFound = false;
             var commonHeadersToClear = {};
 
-            vm.getTeam = function(teamId) {
-              ClubFactory.getTeam(teamId)
-                         .then(function (data){
-                           setTeam(data)
+            vm.getLeagues = function() {
+              PostFactory.getFootballData(href)
+                         .then(function success(res){
+                         vm.leagues = res
               });
             };
 
+            vm.getTeams = function(league) {
+              href = 'http://api.football-data.org/v1/competitions/' + competitionId  + '/teams'
+              PostFactory.getFootballData(href)
+                         .then(function success(res){
+                         vm.leagues = res
+                         leagueId = league
+              });
+            };
 
-            vm.createPlayer = function (teamId, player) {
-              ClubFactory.createPlayer(teamId, player)
+            vm.getGames = function(link) {
+              href = link
+              PostFactory.getFootballData(href)
+                         .then(function success(res){
+                         vm.teams = res
+                         teamId = link.substring(38,3)
+              });
+            };
+
+            vm.getPosts = function(matchday) {
+              PostFactory.getPosts()
+                         .then(function (data){
+                         setPosts(data)
+                         gameId = matchday
+              });
+            };
+
+            vm.createPost = function (post) {
+              PostFactory.createPost(post)
                          .then(function success(response){
-                           vm.getTeam(teamId);
+                         vm.getPosts();
                          });
             };
 
 
-            vm.editPlayer = function (teamId, player, Id) {
-              ClubFactory.editPlayer(teamId, player, Id)
+            vm.editPost = function (post, Id) {
+              postFactory.editPost(post, Id)
                          .then(function success(response){
-                           vm.getTeam(teamId);
+                         vm.getPosts();
                           });
             };
 
-            vm.deletePlayer = function (teamId, Id) {
-              ClubFactory.deletePlayer(teamId, Id)
+            vm.deletePost = function (Id) {
+              PostFactory.deletePost(Id)
                          .then(function success(response){
-                           vm.getTeam(teamId);
+                           vm.getPosts();
                           });
             };
 
+            vm.leagues = vm.getLeagues()
+            vm.posts = vm.getPosts()
 
-            vm.team = vm.getTeam(teamId)
-
-            function setTeam(data) {
-              vm.team = data;
-              vm.player = { id: null, name: '', team_id: teamId, };
+            function setPosts(data) {
+              vm.posts = data;
+              vm.post = { id: null, title: '', body: '' };
               selectedId = -1;
+              leagueId = -1;
+              teamId = -1;
+              gameId = -1;
             }
 
             vm.handleCreate = function(){
-              vm.createPlayer(teamId, vm.player);
+              vm.post.league_id = leagueId;
+              vm.post.team_id = teamId;
+              vm.post.game_id = gameId;
+              vm.createPost(vm.post);
             }
             vm.handleEdit = function(id){
-              vm.editPlayer(teamId, vm.player, id);
+              vm.editPost(vm.post, id);
             }
             vm.handleDelete = function(id){
-              vm.deletePlayer(teamId, id);
+              vm.deletePost(id);
             }
 
             vm.handleCancel = function(){
-              vm.getTeam(teamId);
+              vm.getPosts();
+            }
+
+            function isInLeagueMode(){
+              return leagueId == -1 && teamId == -1 && gameId == -1;
+            }
+
+            function isInTeamMode(){
+              return leagueId != -1 && teamId == -1 && gameId == -1;
+            }
+
+            function isInGameMode(){
+              return leagueId != -1 && teamId != -1 && gameId == -1;
+            }
+
+            function isInPostMode(){
+              return leagueId != -1 && teamId != -1 && gameId != -1;
             }
 
             function isInReadMode(id){
@@ -84,16 +135,17 @@
               return id == selectedId;
             }
 
-            function startEdit(id, name){
+            function startEdit(id, title, body){
               selectedId = id;
-              vm.player.id = id;
-              vm.player.name = name;
+              vm.post.id = id;
+              vm.post.title = title;
+              vm.post.body = body;
             }
 
             function loadFixtures(){
-              ClubFactory.getFootballData(href)
+              postFactory.getFootballData(href)
                 .then(function success(res){
-                  competitions = res;
+                  cs = res;
                   for (i = 0; i < competitions.length; i++) {
                     if (competitions[i].league == vm.team.league) {
                       competitionId = competitions[i].id;
@@ -103,7 +155,7 @@
                   }
                   if (competitionFound){
                     href = 'http://api.football-data.org/v1/competitions/' + competitionId  + '/teams'
-                    ClubFactory.getFootballData(href)
+                    postFactory.getFootballData(href)
                       .then(function success(res){
                         teams = res.teams;
                         for (i = 0; i < teams.length; i++) {
@@ -114,7 +166,7 @@
                           };
                         }
                         if (teamFound){
-                          ClubFactory.getFootballData(href)
+                          postFactory.getFootballData(href)
                             .then(function success(res){
                               fixtures = res.fixtures;
                               for (i = 0; i < fixtures.length; i++) {

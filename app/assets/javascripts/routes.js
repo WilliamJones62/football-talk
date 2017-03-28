@@ -11,7 +11,7 @@
           })
 
           .state('posts', {
-            url: '/:leagueId/:teamId/:gameId/posts',
+            url: '/posts',
             templateUrl: 'post.html',
             controller: 'PostController as vm'
           })

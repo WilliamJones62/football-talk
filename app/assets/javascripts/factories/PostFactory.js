@@ -3,17 +3,17 @@
 
     angular
         .module('app')
-        .factory('ClubFactory', ['$http', function($http) {
+        .factory('PostFactory', ['$http', function($http) {
             return {
-                getTeam: getTeam,
+                getPosts: getPosts,
                 getFootballData: getFootballData,
-                createPlayer: createPlayer,
-                deletePlayer: deletePlayer,
-                editPlayer: editPlayer
+                createPost: createPost,
+                deletePost: deletePost,
+                editPost: editPost
             }
 
-            function getTeam(id) {
-              return $http.get('/teams/' + id)
+            function getPosts() {
+              return $http.get('/posts/')
                           .then(handleResponse)
                           .catch(handleError)
             }
@@ -25,20 +25,20 @@
                           .catch(handleError)
             }
 
-            function createPlayer(teamId, player) {
-              return $http.post('/teams/' + teamId + '/players/', player)
+            function createPost(post) {
+              return $http.post('/posts/', player)
                           .then(handleResponse)
                           .catch(handleError)
             }
 
-            function editPlayer(teamId, player, Id) {
-              return $http.put('/teams/' + teamId + '/players/' + Id, player)
+            function editPost(post, Id) {
+              return $http.put('/posts/' + Id, player)
                           .then(handleResponse)
                           .catch(handleError)
             }
 
-            function deletePlayer(teamId, Id) {
-              return $http.delete('/teams/' + teamId + '/players/' + Id)
+            function deletePost(Id) {
+              return $http.delete('/posts/' + Id)
                           .then(handleResponse)
                           .catch(handleError)
             }

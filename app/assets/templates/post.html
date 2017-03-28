@@ -5,8 +5,8 @@
     <h1 class="text-center"> Choose a league </h1>
     <input class="search-btn pull-right" placeholder="Search for a League" ng-model="search.name">
     <div ng-repeat="league in vm.leagues | filter:search">
-      {{ league.name }}
-      <button ng-click="vm.selectTeam(league.id, league.name)">Select</button>
+      {{ league.caption }}
+      <button ng-click="vm.getTeams(league.id)">Select</button>
     </div>
   </div>
 
@@ -14,11 +14,11 @@
   <div ng-show="vm.isInTeamMode">
 
     <h1 class="text-center"> Choose a Team </h1>
-    <h2 class="text-center" ng-bind="vm.league.name"> </h2>
+    <h2 class="text-center" ng-bind="vm.league.caption"> </h2>
     <input class="search-btn pull-right" placeholder="Search for a League" ng-model="search.name">
     <div ng-repeat="team in vm.teams | filter:search">
       {{ team.name }}
-      <button ng-click="vm.selectGame(league.id, league.name, team.id, team.name)">Select</button>
+      <button ng-click="vm.getGames(team.id, team.links.fixtures.href)">Select</button>
     </div>
   </div>
 
@@ -34,7 +34,7 @@
       Goals for - {{ game.for }}
       Goals Against - {{ game.against }}
       Status - {{ game.status }}
-      <button ng-click="vm.selectPost(league.id, league.name, team.id, team.name, game.id, game.date, game.opponent)">Select</button>
+      <button ng-click="vm.getPosts(game.matchday)">Select</button>
     </div>
   </div>
 
@@ -82,7 +82,7 @@
     </form>
 
     <div ng-repeat="post in vm.posts | filter:search">
-      <div ng-show="vm.isInReadMode(player.id)">
+      <div ng-show="vm.isInReadMode(post.id)">
         {{ post.title }}
         {{ post.body }}
         <button ng-click="vm.startEdit(post.id, post.title, post.body)">Edit</button>
