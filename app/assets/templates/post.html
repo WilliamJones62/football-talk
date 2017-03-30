@@ -1,44 +1,46 @@
 <div class="post">
 
-  <div ng-show="vm.isInLeagueMode">
+  <div ng-show="vm.isInLeagueMode()">
 
     <h1 class="text-center"> Choose a league </h1>
-    <input class="search-btn pull-right" placeholder="Search for a League" ng-model="search.name">
+    <input class="search-btn pull-right" placeholder="Search for a League" ng-model="search.caption">
     <div ng-repeat="league in vm.leagues | filter:search">
       {{ league.caption }}
-      <button ng-click="vm.getTeams(league.id)">Select</button>
+      <button ng-click="vm.getTeams(league.id, league.caption)">Select</button>
     </div>
   </div>
 
 
-  <div ng-show="vm.isInTeamMode">
+  <div ng-show="vm.isInTeamMode()">
 
     <h1 class="text-center"> Choose a Team </h1>
-    <h2 class="text-center" ng-bind="vm.league.caption"> </h2>
-    <input class="search-btn pull-right" placeholder="Search for a League" ng-model="search.name">
-    <div ng-repeat="team in vm.teams | filter:search">
+    <h2 class="text-center" ng-bind="vm.league"> </h2>
+    <div ng-repeat="team in vm.teams">
       {{ team.name }}
-      <button ng-click="vm.getGames(team.id, team.links.fixtures.href)">Select</button>
+      <button ng-click="vm.getGames(team.name, team._links.fixtures.href)">Select</button>
     </div>
   </div>
 
-  <div ng-show="vm.isInGameMode">
+  <div ng-show="vm.isInGameMode()">
 
     <h1 class="text-center"> Choose a Game </h1>
-    <h2 class="text-center" ng-bind="vm.league.name"> </h2>
-    <h3 class="text-center" ng-bind="vm.team.name"> </h3>
-    <div ng-repeat="game in vm.games">
-      {{ game.home }} game
-      Opponent - {{ game.opponent }}
-      Date - {{ game.date }}
-      Goals for - {{ game.for }}
-      Goals Against - {{ game.against }}
-      Status - {{ game.status }}
-      <button ng-click="vm.getPosts(game.matchday)">Select</button>
-    </div>
+    <h2 class="text-center" ng-bind="vm.league"> </h2>
+    <h3 class="text-center" ng-bind="vm.team"> </h3>
+    <table id="gameTable">
+      <tr><th>Location</th><th>Opponent</th><th>Goals For</th><th>Goals Against</th><th>Date</th><th>Status</th></tr>
+      <tr ng-repeat="game in vm.games">
+        <td>{{ game.home }}</td>
+        <td>{{ game.opponent }}</td>
+        <td>{{ game.for }}</td>
+        <td>{{ game.against }}</td>
+        <td>{{ game.date }}</td>
+        <td>{{ game.status }}</td>
+        <td><button ng-click="vm.getPosts(game.matchday)">Select</button></td>
+      </tr>
+    </table>
   </div>
 
-  <div ng-show="vm.isInPostMode">
+  <div ng-show="vm.isInPostMode()">
 
     <h1 class="text-center"> Posts </h1>
     <h2 class="text-center" ng-bind="vm.team.name"> </h2>

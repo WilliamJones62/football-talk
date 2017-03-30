@@ -1,6 +1,9 @@
 class PostsController < ApplicationController
 
-  before_action :set_post
+  before_action :set_post, except: :home
+
+  def home
+  end
 
   def post_data
     post = post.find(params[:id])

@@ -44,7 +44,7 @@
             }
 
             function handleResponse(response) {
-                if (response.status === 200) return response.data
+                return response.data
 
             }
 
