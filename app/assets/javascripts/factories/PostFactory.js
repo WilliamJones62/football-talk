@@ -26,13 +26,13 @@
             }
 
             function createPost(post) {
-              return $http.post('/posts/', player)
+              return $http.post('/posts/', post)
                           .then(handleResponse)
                           .catch(handleError)
             }
 
             function editPost(post, Id) {
-              return $http.put('/posts/' + Id, player)
+              return $http.put('/posts/' + Id, post)
                           .then(handleResponse)
                           .catch(handleError)
             }
@@ -44,12 +44,12 @@
             }
 
             function handleResponse(response) {
-                return response.data
+              if (response.status === 200) return response.data
 
             }
 
             function handleError(error) {
-                console.log("There was an error this http request: ", error)
+              console.log("There was an error this http request: ", error)
             }
         }])
 }())

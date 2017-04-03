@@ -22,6 +22,9 @@
             vm.games = [];
             var fixtures = [];
             vm.league = '';
+            vm.team = '';
+            vm.date = '';
+            vm.opponent = '';
             var i = 0;
             var href = 'http://api.football-data.org/v1/competitions/';
             var commonHeadersToClear = {};
@@ -30,6 +33,9 @@
               PostFactory.getFootballData(href)
                          .then(function success(res){
                          vm.leagues = res
+                         leagueId = -1;
+                         teamId = -1;
+                         gameId = -1;
               });
             };
 
@@ -47,22 +53,25 @@
             vm.getGames = function(team, link) {
               href = link
               vm.team = team
-              teamId = link.substring(38,3)
+              teamId = link.substring(38,41)
               PostFactory.getFootballData(href)
                          .then(function success(res){
                          fixtures = res.fixtures;
                          for (i = 0; i < fixtures.length; i++) {
-                           if (fixtures[i].homeTeamName == vm.team.name){
-                             vm.games.push({date: fixtures[i].date.substring(0,10), status: fixtures[i].status, home: 'Home', for: fixtures[i].result.goalsHomeTeam, against: fixtures[i].result.goalsAwayTeam, opponent: fixtures[i].awayTeamName, matchday: fixtures[i].matchDay});
+                           if (fixtures[i].homeTeamName == vm.team){
+                             vm.games.push({date: fixtures[i].date.substring(0,10), status: fixtures[i].status, home: 'Home', for: fixtures[i].result.goalsHomeTeam, against: fixtures[i].result.goalsAwayTeam, opponent: fixtures[i].awayTeamName, matchday: fixtures[i].matchday});
                            } else {
-                             vm.games.push({date: fixtures[i].date.substring(0,10), status: fixtures[i].status, home: 'Away', for: fixtures[i].result.goalsAwayTeam, against: fixtures[i].result.goalsHomeTeam, opponent: fixtures[i].homeTeamName, matchday: fixtures[i].matchDay});
+                             vm.games.push({date: fixtures[i].date.substring(0,10), status: fixtures[i].status, home: 'Away', for: fixtures[i].result.goalsAwayTeam, against: fixtures[i].result.goalsHomeTeam, opponent: fixtures[i].homeTeamName, matchday: fixtures[i].matchday});
                            }
                          }
+
               });
             };
 
-            vm.getPosts = function(matchday) {
+            vm.getPosts = function(matchday, date, opponent) {
               gameId = matchday
+              vm.date = date
+              vm.opponent = opponent
               PostFactory.getPosts()
                          .then(function (data){
                          setPosts(data)
@@ -97,9 +106,6 @@
               vm.posts = data;
               vm.post = { id: null, title: '', body: '' };
               selectedId = -1;
-              leagueId = -1;
-              teamId = -1;
-              gameId = -1;
             }
 
             vm.handleCreate = function(){

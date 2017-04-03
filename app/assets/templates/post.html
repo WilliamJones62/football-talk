@@ -26,7 +26,7 @@
     <h1 class="text-center"> Choose a Game </h1>
     <h2 class="text-center" ng-bind="vm.league"> </h2>
     <h3 class="text-center" ng-bind="vm.team"> </h3>
-    <table id="gameTable">
+    <table>
       <tr><th>Location</th><th>Opponent</th><th>Goals For</th><th>Goals Against</th><th>Date</th><th>Status</th></tr>
       <tr ng-repeat="game in vm.games">
         <td>{{ game.home }}</td>
@@ -35,7 +35,7 @@
         <td>{{ game.against }}</td>
         <td>{{ game.date }}</td>
         <td>{{ game.status }}</td>
-        <td><button ng-click="vm.getPosts(game.matchday)">Select</button></td>
+        <td><button ng-click="vm.getPosts(game.matchday, game.date, game.opponent)">Select</button></td>
       </tr>
     </table>
   </div>
@@ -43,9 +43,9 @@
   <div ng-show="vm.isInPostMode()">
 
     <h1 class="text-center"> Posts </h1>
-    <h2 class="text-center" ng-bind="vm.team.name"> </h2>
-    <h3 class="text-center" ng-bind="vm.game.date"> </h3>
-    <h4 class="text-center" ng-bind="vm.game.opponent"> </h3>
+    <h2 class="text-center" ng-bind="vm.team"> </h2>
+    <h3 class="text-center" ng-bind="vm.date"> </h3>
+    <h4 class="text-center" ng-bind="vm.opponent"> </h3>
     <div class="margin-b-20">
       <button ng-click="showadd=true">Add a Post</button>
       <input class="search-btn pull-right" placeholder="Search for a Post" ng-model="search.name">
@@ -60,14 +60,15 @@
       ng-model="vm.post.title"
       required="required"
       >
-
-      <input name="addBody"
+      <br>
+      <textarea name="addBody"
       type="text"
       class="new-body"
       placeholder="Post Body"
       ng-model="vm.post.body"
       required="required"
       >
+      </textarea>
 
       <button ng-if="addForm.$valid " ng-click="vm.handleCreate()">Add</button>
 
@@ -122,6 +123,7 @@
         </form>
       </div>
     </div>
+  </div>
 
   <button ui-sref="home">Home</button>
 

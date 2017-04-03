@@ -1,17 +1,15 @@
 class PostsController < ApplicationController
 
-  before_action :set_post, except: :home
+  before_action :set_post, only: [ :show, :update, :destroy ]
+  before_action :signed_in?, only: [:new, :edit, :update, :destroy]
+  before_action :authorize_user!, only: [:edit, :update, :destroy]
 
   def home
   end
 
-  def post_data
-    post = post.find(params[:id])
-    render json: post.to_json
-  end
-
   def create
-    @post = @posts.build(posts_params)
+    @post = Post.new(posts_params)
+    @post.user_id = current_user.id
     if @post.save
       render :json => @post
     else
@@ -20,11 +18,11 @@ class PostsController < ApplicationController
   end
 
   def index
+    @posts = Post.all
     render :json => @posts
   end
 
   def show
-    @post = post.find(params[:id])
     if @post
       render json: @post
     else
@@ -33,7 +31,6 @@ class PostsController < ApplicationController
   end
 
   def update
-    @post = post.find(params[:id])
     if @post.update(posts_params)
       render nothing: true
     else
@@ -42,17 +39,11 @@ class PostsController < ApplicationController
   end
 
   def destroy
-    @post = post.find(params[:id])
     if @post.destroy
       render nothing: true
     else
       render json: { errors: "Error deleting post, please try again"}
     end
-  end
-
-  def data
-    post = post.find(params[:id])
-    render json: post.to_json(only: [:title, :body])
   end
 
   private
@@ -62,6 +53,18 @@ class PostsController < ApplicationController
 
     def posts_params
       params.require(:post).permit(:title, :body, :league_id, :team_id, :game_id)
+    end
+
+    def signed_in?
+      unless current_user
+        redirect_to posts_path, :alert => "Access denied."
+      end
+    end
+
+    def authorize_user!
+      unless current_user.id == @post.user_id || current_user.admin?
+        redirect_to post_path(id: @post.id), :alert => "Access denied."
+      end
     end
 
 end
