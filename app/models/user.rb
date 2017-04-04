@@ -6,6 +6,7 @@ class User < ActiveRecord::Base
          :omniauthable, :omniauth_providers => [:facebook]
   has_many :posts
   enum role: [:normal, :admin]
+  
   def guest?
     persisted?
   end

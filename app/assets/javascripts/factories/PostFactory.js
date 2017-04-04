@@ -12,8 +12,12 @@
                 editPost: editPost
             }
 
-            function getPosts() {
-              return $http.get('/posts/')
+            $http.get(user.details_path, {
+                params: { user_id: user.id }
+            });
+
+            function getPosts(league_id, team_id, game_id) {
+              return $http.get('/posts/', {params: { league_id: league_id, team_id: team_id, game_id: game_id }})
                           .then(handleResponse)
                           .catch(handleError)
             }

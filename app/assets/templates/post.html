@@ -4,10 +4,13 @@
 
     <h1 class="text-center"> Choose a league </h1>
     <input class="search-btn pull-right" placeholder="Search for a League" ng-model="search.caption">
-    <div ng-repeat="league in vm.leagues | filter:search">
-      {{ league.caption }}
-      <button ng-click="vm.getTeams(league.id, league.caption)">Select</button>
-    </div>
+    <table>
+      <tr><th>League</th></tr>
+      <tr ng-repeat="league in vm.leagues | filter:search">
+        <td>{{ league.caption }}</td>
+        <td><button ng-click="vm.getTeams(league.id, league.caption)">Select</button></td>
+      </tr>
+    </table>
   </div>
 
 
@@ -15,10 +18,13 @@
 
     <h1 class="text-center"> Choose a Team </h1>
     <h2 class="text-center" ng-bind="vm.league"> </h2>
-    <div ng-repeat="team in vm.teams">
-      {{ team.name }}
-      <button ng-click="vm.getGames(team.name, team._links.fixtures.href)">Select</button>
-    </div>
+    <table>
+      <tr><th>Team</th></tr>
+      <tr ng-repeat="team in vm.teams">
+        <td>{{ team.name }}</td>
+        <td><button ng-click="vm.getGames(team.name, team._links.fixtures.href)">Select</button></td>
+      </tr>
+    </table>
   </div>
 
   <div ng-show="vm.isInGameMode()">
@@ -87,12 +93,13 @@
     <div ng-repeat="post in vm.posts | filter:search">
       <div ng-show="vm.isInReadMode(post.id)">
         {{ post.title }}
+        <br>
         {{ post.body }}
         <button ng-click="vm.startEdit(post.id, post.title, post.body)">Edit</button>
         <button ng-click="vm.handleDelete(post.id)">Delete</button>
       </div>
 
-      <div ng-show="vm.isInEditMode(player.id)">
+      <div ng-show="vm.isInEditMode(post.id)">
         <form name="editForm">
 
           <input
@@ -102,13 +109,15 @@
             ng-model="vm.post.title"
             required="required"
           >
-          <input
-            name="editBody"
+          <br>
+          <textarea name="editBody"
             type="text"
             class="edit-post"
             ng-model="vm.post.body"
             required="required"
           >
+          </textarea>
+
           <button ng-if="editForm.$valid " ng-click="vm.handleEdit(post.id)">Save</button>
           <button ng-click="vm.handleCancel()">Cancel</button>
 

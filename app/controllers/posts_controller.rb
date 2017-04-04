@@ -1,8 +1,8 @@
 class PostsController < ApplicationController
 
   before_action :set_post, only: [ :show, :update, :destroy ]
-  before_action :signed_in?, only: [:new, :edit, :update, :destroy]
-  before_action :authorize_user!, only: [:edit, :update, :destroy]
+  before_action :signed_in?, only: [:create, :update, :destroy]
+  before_action :authorize_user!, only: [:update, :destroy]
 
   def home
   end
@@ -18,7 +18,7 @@ class PostsController < ApplicationController
   end
 
   def index
-    @posts = Post.all
+    @posts = Post.where("league_id = ? AND team_id = ? AND game_id = ?", params[:league_id], params[:team_id], params[:game_id])
     render :json => @posts
   end
 
@@ -48,7 +48,7 @@ class PostsController < ApplicationController
 
   private
     def set_post
-      @post = Post.find(params[:post_id])
+      @post = Post.find(params[:id])
     end
 
     def posts_params

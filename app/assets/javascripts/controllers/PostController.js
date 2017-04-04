@@ -70,9 +70,9 @@
 
             vm.getPosts = function(matchday, date, opponent) {
               gameId = matchday
-              vm.date = date
-              vm.opponent = opponent
-              PostFactory.getPosts()
+              vm.date = date;
+              vm.opponent = opponent;
+              PostFactory.getPosts(leagueId, teamId, gameId)
                          .then(function (data){
                          setPosts(data)
               });
@@ -81,22 +81,22 @@
             vm.createPost = function (post) {
               PostFactory.createPost(post)
                          .then(function success(response){
-                         vm.getPosts();
+                         vm.getPosts(gameId, vm.date, vm.opponent);
                          });
             };
 
 
             vm.editPost = function (post, Id) {
-              postFactory.editPost(post, Id)
+              PostFactory.editPost(post, Id)
                          .then(function success(response){
-                         vm.getPosts();
+                           vm.getPosts(gameId, vm.date, vm.opponent);
                           });
             };
 
             vm.deletePost = function (Id) {
               PostFactory.deletePost(Id)
                          .then(function success(response){
-                           vm.getPosts();
+                           vm.getPosts(gameId, vm.date, vm.opponent);
                           });
             };
 
@@ -122,7 +122,7 @@
             }
 
             vm.handleCancel = function(){
-              vm.getPosts();
+              vm.getPosts(gameId, vm.date, vm.opponent);
             }
 
             function isInLeagueMode(){
