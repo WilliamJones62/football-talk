@@ -8,12 +8,16 @@ class PostsController < ApplicationController
   end
 
   def create
-    @post = Post.new(posts_params)
-    @post.user_id = current_user.id
-    if @post.save
-      render :json => @post
+    if @signed_in
+      @post = Post.new(posts_params)
+      @post.user_id = current_user.id
+      if @post.save
+        render :json => @post
+      else
+        render json: { errors: "Error creating post, please try again."}
+      end
     else
-      render json: { errors: "Error creating post, please try again."}
+      render json: { errors: "Access denied. Sign In."}
     end
   end
 
@@ -31,18 +35,26 @@ class PostsController < ApplicationController
   end
 
   def update
-    if @post.update(posts_params)
-      render nothing: true
+    if @signed_in and @authorized
+      if @post.update(posts_params)
+        render nothing: true
+      else
+        render json: { errors: "Error updating post, please try again."}
+      end
     else
-      render json: { errors: "Error updating post, please try again."}
+      render json: { errors: "Access denied."}
     end
   end
 
   def destroy
-    if @post.destroy
-      render nothing: true
+    if @signed_in and @authorized
+      if @post.destroy
+        render nothing: true
+      else
+        render json: { errors: "Error deleting post, please try again"}
+      end
     else
-      render json: { errors: "Error deleting post, please try again"}
+      render json: { errors: "Access denied."}
     end
   end
 
@@ -56,14 +68,16 @@ class PostsController < ApplicationController
     end
 
     def signed_in?
+      @signed_in = true
       unless current_user
-        redirect_to posts_path, :alert => "Access denied."
+        @signed_in = false
       end
     end
 
     def authorize_user!
+      @authorized = true
       unless current_user.id == @post.user_id || current_user.admin?
-        redirect_to post_path(id: @post.id), :alert => "Access denied."
+        @authorized = false
       end
     end
 
